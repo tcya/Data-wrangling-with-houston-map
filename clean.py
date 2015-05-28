@@ -92,10 +92,10 @@ def check_v_value(filename, tags):
 
 # tag_names = [k_value_count[i][0] for i in range(20)]
 # print tag_names
-tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
+# tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
 
 # pprint.pprint(check_v_value('sample.osm', tag_names))
-pprint.pprint(check_v_value('houston_texas.osm', tag_names))
+# pprint.pprint(check_v_value('houston_texas.osm', tag_names))
 # pprint.pprint(check_v_value('cleaned_file.osm', tag_names))
 
 """
@@ -359,4 +359,4 @@ def write_cleaned_file(input_file, output_file):
             element.clear()
         output.write('</osm>')
 
-# write_cleaned_file('houston_texas_manually_cleaned.osm', 'cleaned_file.osm')
+write_cleaned_file('houston_texas_manually_cleaned.osm', 'cleaned_file.osm')
