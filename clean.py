@@ -347,7 +347,7 @@ def process_map(file_in, file_out, pretty = False):
     return
 
 # process_map('sample.osm', 'sample.json')
-# process_map('houston_texas_manually_cleaned.osm', 'cleaned.json')
+process_map('houston_texas_manually_cleaned.osm', 'cleaned.json')
 
 def write_cleaned_file(input_file, output_file):
     with open(output_file, 'wb') as output:
@@ -359,4 +359,4 @@ def write_cleaned_file(input_file, output_file):
             element.clear()
         output.write('</osm>')
 
-write_cleaned_file('houston_texas_manually_cleaned.osm', 'cleaned_file.osm')
+# write_cleaned_file('houston_texas_manually_cleaned.osm', 'cleaned_file.osm')
