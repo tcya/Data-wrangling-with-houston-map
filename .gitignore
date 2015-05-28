@@ -1,0 +1,9 @@
+cleaned.json
+cleaned_file.osm
+houston_texas.osm
+houston_texas_manually_cleaned.osm
+*.aux
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
