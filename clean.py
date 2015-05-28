@@ -74,7 +74,7 @@ def count_tags(filename):
         return
 
 # count_tags('sample.osm')
-count_tags('houston_texas.osm')
+# count_tags('houston_texas.osm')
 
 def check_v_value(filename, tags):
     """
@@ -92,10 +92,10 @@ def check_v_value(filename, tags):
 
 # tag_names = [k_value_count[i][0] for i in range(20)]
 # print tag_names
-# tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
+tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
 
 # pprint.pprint(check_v_value('sample.osm', tag_names))
-# pprint.pprint(check_v_value('houston_texas.osm', tag_names))
+pprint.pprint(check_v_value('houston_texas.osm', tag_names))
 # pprint.pprint(check_v_value('cleaned_file.osm', tag_names))
 
 """
