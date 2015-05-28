@@ -92,11 +92,11 @@ def check_v_value(filename, tags):
 
 # tag_names = [k_value_count[i][0] for i in range(20)]
 # print tag_names
-# tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
+tag_names = ['tiger:county', 'tiger:reviewed', 'tiger:source', 'tiger:separated', 'tiger:name_type', 'tiger:zip_left', 'tiger:zip_right', 'power', 'oneway', 'service', 'building', 'surface', 'amenity', 'addr:housenumber', 'addr:street', 'addr:city', 'addr:postcode', 'addr:state', 'gnis:county_name', 'tiger:zip_right_1', 'tiger:zip_left_1']
 
 # pprint.pprint(check_v_value('sample.osm', tag_names))
 # pprint.pprint(check_v_value('houston_texas.osm', tag_names))
-# pprint.pprint(check_v_value('cleaned_file.osm', tag_names))
+pprint.pprint(check_v_value('cleaned_file.osm', tag_names))
 
 """
 Transform xml to JSON. The output should be a list of dictionaries
@@ -347,7 +347,7 @@ def process_map(file_in, file_out, pretty = False):
     return
 
 # process_map('sample.osm', 'sample.json')
-process_map('houston_texas_manually_cleaned.osm', 'cleaned.json')
+# process_map('houston_texas_manually_cleaned.osm', 'cleaned.json')
 
 def write_cleaned_file(input_file, output_file):
     with open(output_file, 'wb') as output:
