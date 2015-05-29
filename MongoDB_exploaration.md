@@ -1,4 +1,4 @@
-Size of the file:  2628926
+Length of the file:  2628926
 Number of unique users:  1053
 Number of nodes:  2380486
 Number of ways:  248440

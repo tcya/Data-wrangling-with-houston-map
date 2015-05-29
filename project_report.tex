@@ -1,0 +1,159 @@
+\title{Cleaning OpenStreetMap Data of Houston}
+\documentclass[12pt]{article}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+% \usepackage{minted}
+\usepackage{color}
+\definecolor{lightgray}{rgb}{.7,.7,.7}
+\definecolor{gray}{rgb}{.4,.4,.4}
+\definecolor{darkblue}{rgb}{0,0,.3}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+\hyphenpenalty=1000
+\tolerance=3000
+%  \lstdefinelanguage{XML}
+% {
+%   % morestring=[b][\color{red}]",
+%   % morestring=[s]{>}{<},
+%   % morecomment=[s]{<?}{?>},
+%   stringstyle=\color{black},
+%   identifierstyle=\color{darkblue},
+%   keywordstyle=\color{cyan},
+%   morekeywords={xmlns,version,type},
+%   backgroundcolor=\color{lightgray},
+%   basicstyle=\small\tt,
+%   numbers=right,
+%   numberstyle=\footnotesize\ttfamily\color{gray},
+%   numbersep=0.5pt
+% }
+\begin{document}
+\maketitle
+
+\section{Introduction}
+I chose Houston as my studying case, simply because right now I live here. It's the fourth largest city in America and has many immigrants, mostly Mexican. The map data of Houston was obtained from Mapzen, \url{https://s3.amazonaws.com/metro-extracts.mapzen.com/houston_texas.osm.bz2}. It's named ``houton\_texas.osm'', with The size of ~540M. By sampling with ``sampling.py'', a sample file, ``sample.osm'', about 55M, was obtained. However, all operations on the full data take less than 2 minutes and $<200$M memory in my laptop, so the sample file was only used for explorations. All discussions below are for ``houton\_texas.osm''. The codes for the sample file are kept but commented out so it's straightforward if you want to switch to the sample file.
+
+\section{Cleaning}
+The cleaning codes are in ``cleaning.py''. The cleaning was carried out as follows.
+\subsection{Check Tag Name}
+First, I counted all tag names and attributes to check for any problematic tag and attribute name, especially for those with few counts. The output was stored in ``check\_tag\_name.md''. Everything seems to be right.
+
+\subsection{Check v Value}
+Then I examined attribute v of all tags. After exploration, some attribute k's were chosen and stored in list ``tag\_names''. Their corresponding attribute v values were stored in ``v\_values\_before\_cleaning.md''. Some problems came out at this step, as discussed below.
+
+\subsubsection{Manual cleaning}
+First of all, there are some typos and misplaced information for sure. Here are three examples.
+
+\begin{lstlisting}[language=XML,breaklines=tr, frame=single, basicstyle=\small]
+<node ...
+    <tag k="addr:street" v="6111 N Ossineke Dr, Spring, TX 77386"/>
+    ...
+</node>
+\end{lstlisting}
+
+\begin{lstlisting}[language=XML,breaklines=tr, frame=single, basicstyle=\small]
+<node ...
+    <tag k="addr:housenumber" v="1200 East Blvd."/>
+    ...
+</node>
+\end{lstlisting}
+
+\begin{lstlisting}[language=XML,breaklines=tr, frame=single, basicstyle=\small]
+<node ...
+    <tag k="addr:street" v="912"/>
+    <tag k="addr:housenumber" v="St. Emanuel"/>
+    ...
+</node>
+\end{lstlisting}
+
+In the first one, the full address rather than ``N. Ossineke Dr.'' was put in ``addr:street''. Similar mistake happened in the second case. ``addr:housenumber'' was supposed to have value of ``1200'', without street name. In the third one, the values of ``addr:street'' and ``addr:housenumber'' should be interchanged.
+
+These certain mistakes don't have a general pattern. Fortunately, they don't occur too often, so I cleaned them by hand. For the first two types of mistakes, besides correcting the original tags, new tags like ``addr:city''and ``addr:state'' were added when necessary to keep information. All manual cleaning were summarized in ``items\_manually\_cleaned.md''. The data after manual cleaning were saved in ``houston\_texas\_manually\_cleaned.osm''. From now on, all further cleaning will be operated on this file.
+
+\subsubsection{addr:city}
+There are two types of values under tag ``addr:city''. For instance, ``Alvin'' and ``Alvin, TX'', namely, some carry the name of the state. The ``TX'' or anything similar ware removed and only city names were kept.
+
+\subsubsection{addr:housenumber}
+The inconsistency here was that it could be in the form of ``111-A'', ``111 A'' or ``111 \#A''. After cleaning, all were changed to the form of ``111 \#A''.
+
+\subsubsection{addr:postcode}
+The problem of postcode was similar to that of ``addr:city''. Some postcodes were like ``TX 77009''. ``TX'' was removed in cleaning. Another problem was that some postcodes had more than five digits. For example, ``77005-1890''. I didn't change them because extra digits carried information and would be easy to truncate when necessary.
+
+\subsubsection{addr:state}
+``TX'', ``TX - Texas'', ``Texas'', ``Tx'' and ``tx'' all appeared in the data. All were replaced with ``TX''.
+
+\subsubsection{service}
+``drive-through'' was replaced with ``drive\_through'', according to OpenStreetMap's convention.\\
+ \url{https://wiki.openstreetmap.org/wiki/Key:drive_through}
+
+\subsubsection{tiger:county}
+Three forms of seperator were used under this tag. They were colon: ``Austin, TX:Fort Bend, TX'', semicolon: ``Brazoria, TX;Harris, TX'', and semicolon followed by a space: ``Fort Bend, TX; Harris, TX''. All were changed to colon for consistency.
+
+\subsubsection{addr:street}
+Two main problems were found.
+\begin{itemize}
+\item Incomplete name, for example, ``Durham'', ``Bailey'' and ``Maroneal''. Their full name were found by searching on Google map. After cleaning by function ``update\_street\_name\_special'', they became ``Durham Drive'', ``Bailey Road'' and ``Maroneal Street''. However, there were still few of them couldn't be located because of the lack of information. I kept them after I had tried my best.
+\item Over-abbreviated street names, for example, ``W Sam Houston Pky N''. It was cleaned by function ``update\_street\_name\_general'' to ``West Sam Houston Parkway North''. Similar for others.
+\end{itemize}
+
+\subsubsection{Recheck v value}
+After cleaning, the data were written into ``cleaned\_file.osm'' and its v values were rechecked. It was much better.
+
+\subsection{Transform to JSON}
+The elements with name ``node'' and ``way'' in cleaned data were transformed to a JSON file, imported into MangoDB. However, a problem came up. The number of nodes plus that of ways didn't equal to the length of the entire file.
+
+After scrutiny, it turned out that in some elements, they got a tag with $k="type"$. For them, during the transformation, key ``type'' was first assigned to ``node'' or ``way'' and later overrode by the child tag with $k="type"$. To solve it, I stored the v value of `$k="type"$ to a new key called ``k\_type'' and redid transformation. The correct JSON data was dumped into ``cleaned.json''.
+
+\section{Data Overview}
+This section contains basic statistics about the dataset and the MongoDB queries used to gather them. The JSON file was mangoimported into db.examples.houston. Queries were saved in ``mangodb\_query.py'' and results in ``MongoDB\_exploaration.md''. Results were also shown below for convenience.\\
+\textbf{File sizes:}\\
+``houton\_texas.osm'': 541M\\
+``cleaned.json'': 607.1M
+
+\begin{lstlisting}[language=xml,breaklines=tr, basicstyle=\small,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20}]
+Length of the file:  2628926
+Number of unique users:  1053
+Number of nodes:  2380486
+Number of ways:  248440
+Number of cafe:  72
+Number of Starbucks:  40
+Number of Starbucks labeled as cafe:  40
+Top 1 contributing user:
+{u'count': 659497, u'_id': u'woodpeck_fixbot'}
+Top 10 appearing restaurants:
+{u'count': 47, u'_id': u'mexican'}
+{u'count': 28, u'_id': u'american'}
+{u'count': 19, u'_id': u'italian'}
+{u'count': 15, u'_id': u'pizza'}
+{u'count': 15, u'_id': u'burger'}
+{u'count': 13, u'_id': u'chinese'}
+{u'count': 9, u'_id': u'seafood'}
+{u'count': 8, u'_id': u'steak_house'}
+{u'count': 7, u'_id': u'barbecue'}
+{u'count': 5, u'_id': u'vietnamese'}
+Number of atms:  12
+Number of banks:  188
+Top 10 appearing amenities:
+{u'count': 2485, u'_id': u'parking'}
+{u'count': 2435, u'_id': u'place_of_worship'}
+{u'count': 1659, u'_id': u'school'}
+{u'count': 669, u'_id': u'fast_food'}
+{u'count': 466, u'_id': u'restaurant'}
+{u'count': 429, u'_id': u'fountain'}
+{u'count': 402, u'_id': u'fire_station'}
+{u'count': 327, u'_id': u'fuel'}
+{u'count': 209, u'_id': u'grave_yard'}
+{u'count': 188, u'_id': u'bank'}
+\end{lstlisting}
+
+\section{Discussions}
+\begin{itemize}
+\item More than half of cafe reported are Starbucks. They're just so popular.
+\item The number of ATMs is much less than that of banks, but from daily life experience we know that it can't be true. People are more reluctant to upload information of ATM.
+\item  The most popular food is Mexican. Quite fair. Here is Texas!
+\end{itemize}
+
+\section{Additional Thoughts}
+In the data wrangling, the most annoying step was manual cleaning, which was the straightforward solution for those ``hard'' mistakes, like typos and obviously misplaced information. They could be solved programmatically, like using regex, but the codes would be hardly portable because of the randomness of such mistakes. As the result, I didn't bother to do so. Though such mistakes were only a few but they asked for lots of efforts. It would be a good idea if OpenStreetMap could do some prescreening. For example, they could check for the type of postcode to see if it's a number. A warning would be thrown if it isn't. They don't need to forbid users to submit a non-integer postcode but a warning asking for double-checking could significantly reduce such errors, and save data scientist's life.
+\end{document}
+

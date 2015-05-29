@@ -3,7 +3,7 @@ from pymongo import MongoClient
 client = MongoClient('localhost:27017')
 db = client.examples
 
-print 'Size of the file: ', db.houston.count()
+print 'Length of the file: ', db.houston.count()
 print 'Number of unique users: ', len(db.houston.distinct("created.user"))
 print 'Number of nodes: ', db.houston.find({"type":"node"}).count()
 print 'Number of ways: ', db.houston.find({"type":"way"}).count()

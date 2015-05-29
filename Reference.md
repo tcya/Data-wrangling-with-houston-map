@@ -4,3 +4,4 @@ http://www.w3schools.com/xml/
 https://en.wikipedia.org/wiki/XML
 http://lxml.de/tutorial.html#elements-carry-attributes-as-a-dict
 http://docs.mongodb.org/manual/reference/program/mongoimport/
+https://wiki.openstreetmap.org/wiki/Key:drive_through
