@@ -155,5 +155,13 @@ Top 10 appearing amenities:
 
 \section{Additional Thoughts}
 In the data wrangling, the most annoying step was manual cleaning, which was the straightforward solution for those ``hard'' mistakes, like typos and obviously misplaced information. They could be solved programmatically, like using regex, but the codes would be hardly portable because of the randomness of such mistakes. As the result, I didn't bother to do so. Though such mistakes were only a few but they asked for lots of efforts. It would be a good idea if OpenStreetMap could do some prescreening. For example, they could check for the type of postcode to see if it's a number. A warning would be thrown if it isn't. They don't need to forbid users to submit a non-integer postcode but a warning asking for double-checking could significantly reduce such errors, and save data scientist's life.
+
+\section{Notes}
+Some codes are commented out in the final version. To repeat the results above. First you need to extract those zipped files in the directory. Then you can checkout the corresponding commits:\\
+33b38a1310479872bebe116c616a7f39450aa4ca (check tag names)\\
+e6ec0006052a459216499195047fb5cd0286ad44 (check v values)\\
+791cc75287c2ef8645ac32f148d1195de167177b (check v values after cleaning)\\
+72b1b3c88b19a525c88cbf241af25d981822ce4d (write cleaned data to an osm file)\\
+c4dbfe210f2ee42050def47c7382ffcfc9590be7 (write cleaned data to an JSON file).
 \end{document}
 
